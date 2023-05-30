@@ -1,7 +1,7 @@
 # Virtual Cloud Networks
 resource "oci_core_vcn" "vcn1" {
   cidr_block     = "10.1.0.0/16"
-  compartment_id = var.COMPARTMENT_OCID
+  compartment_id = oci_identity_compartment.k8s.compartment_id
   display_name   = "k8s-vcn"
 }
 
