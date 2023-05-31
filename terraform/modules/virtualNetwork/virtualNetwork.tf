@@ -10,7 +10,7 @@ resource "oci_core_vcn" "vcn" {
 resource "oci_core_subnet" "subnet" {
     for_each = var.subnet_config
 
-    cidr_block        = cidrsubnet(var.vcn_cidr, 8, each.value.cidr_id)
+    cidr_block        = cidrsubnet(var.vcn_config[each.value.vcn_key].vcn_cidr, 8, each.value.cidr_id)
     display_name      = each.value.name
     compartment_id    = var.compartment_id
     vcn_id            = oci_core_vcn.vcn[each.value.vcn_key].id
