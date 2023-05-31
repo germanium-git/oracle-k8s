@@ -22,3 +22,9 @@ variable "COMPARTMENT_OCID" {
   description = "Test Compartment for GitHub Action"
   type = string
 }
+
+variable "vcn_cidr" {
+  description = "CIDR range for VCN"
+  type = string
+  default = "10.1.0.0/16"
+}
