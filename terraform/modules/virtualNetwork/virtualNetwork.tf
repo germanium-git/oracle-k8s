@@ -16,7 +16,7 @@ resource "oci_core_subnet" "subnet" {
     vcn_id            = oci_core_vcn.vcn[each.value.vcn_key].id
 
     security_list_ids = [oci_core_vcn.vcn[each.value.vcn_key].default_security_list_id]
-    route_table_id    = oci_core_vcn.vcn[each.value.vcn_key].default_route_table_id
+    route_table_id    = oci_core_route_table.rt[each.value.vcn_key].id
 }
 
 
@@ -33,17 +33,17 @@ resource oci_core_internet_gateway "igw" {
 }
 
 
-resource oci_core_default_route_table "route_table" {
+resource oci_core_route_table "rt" {
     for_each = var.vcn_config
 
+    compartment_id = var.compartment_id
     display_name = "Default RT for ${each.value.name}"
-    manage_default_resource_id = oci_core_vcn.vcn[each.key].default_route_table_id
+    vcn_id = oci_core_vcn.vcn[each.key].id
 
     dynamic "route_rules" {
         for_each = each.value.routes
         content {
-            destination       = "0.0.0.0/0"
-            destination_type  = "CIDR_BLOCK"
+            cicidr_block      = "0.0.0.0/0"
             network_entity_id = oci_core_internet_gateway.igw[each.key].id
         }
     }
