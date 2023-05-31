@@ -15,8 +15,8 @@ resource "oci_core_subnet" "subnet" {
     compartment_id    = var.compartment_id
     vcn_id            = oci_core_vcn.vcn[each.value.vcn_key].id
 
-    security_list_ids = [oci_core_vcn[each.value.vcn_key].default_security_list_id]
-    route_table_id    = oci_core_vcn[each.value.vcn_key].default_route_table_id
+    security_list_ids = [oci_core_vcn.vcn[each.value.vcn_key].default_security_list_id]
+    route_table_id    = oci_core_vcn.vcn[each.value.vcn_key].default_route_table_id
 }
 
 
