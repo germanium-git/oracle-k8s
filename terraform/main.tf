@@ -14,6 +14,7 @@ module "virtual_network" {
 
     subnet_config = {
         subnet1 = {
+            name = "subnet1"
             cidr_id = 1
             vcn_key = "vcn1"
         }
