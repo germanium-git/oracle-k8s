@@ -19,6 +19,8 @@ module "virtual_network" {
         }
     }
 
+    compartment_id = oci_identity_compartment.k8s.compartment_id
+
     nsg_rules = {
         rule1 = {
             vcn_key       = "vcn1"
