@@ -1,9 +1,6 @@
 terraform {
    required_providers {
-      hashi-oci = {
-         source = "hashicorp/oci"
-      }
-      oracle-oci = {
+      oci = {
          source = "oracle/oci"
       }
    }
@@ -18,15 +15,7 @@ terraform {
    }
 }
 
-provider "oracle-oci" {
-   region       = "eu-frankfurt-1"
-   tenancy_ocid = var.TENANCY_OCID
-   user_ocid    = var.USER_OCID
-   fingerprint  = var.FINGERPRINT
-   private_key  = var.PRIVATE_KEY
-}
-
-provider "hashi-oci" {
+provider "oci" {
    region       = "eu-frankfurt-1"
    tenancy_ocid = var.TENANCY_OCID
    user_ocid    = var.USER_OCID
