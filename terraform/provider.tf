@@ -3,6 +3,9 @@ terraform {
       oci = {
          source = "oracle/oci"
       }
+      hoci = {
+         source = "hashicorp/oci"
+    }
    }
    backend "remote" {
    # The name of your Terraform Cloud organization.
@@ -15,6 +18,13 @@ terraform {
    }
 }
 
+provider "hoci" {
+   region       = "eu-frankfurt-1"
+   tenancy_ocid = var.TENANCY_OCID
+   user_ocid    = var.USER_OCID
+   fingerprint  = var.FINGERPRINT
+   private_key  = var.PRIVATE_KEY
+}
 
 provider "oci" {
    region       = "eu-frankfurt-1"
