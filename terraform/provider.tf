@@ -1,7 +1,10 @@
 terraform {
    required_providers {
-      oci = {
+      hashi-oci = {
          source = "hashicorp/oci"
+      }
+      oracle-oci = {
+         source = "oracle/oci"
       }
    }
    backend "remote" {
@@ -15,7 +18,7 @@ terraform {
    }
 }
 
-provider "oci" {
+provider "oracle-oci" {
    region       = "eu-frankfurt-1"
    tenancy_ocid = var.TENANCY_OCID
    user_ocid    = var.USER_OCID
@@ -23,8 +26,7 @@ provider "oci" {
    private_key  = var.PRIVATE_KEY
 }
 
-provider "oci" {
-   alias        = "frankfurt1"
+provider "hashi-oci" {
    region       = "eu-frankfurt-1"
    tenancy_ocid = var.TENANCY_OCID
    user_ocid    = var.USER_OCID

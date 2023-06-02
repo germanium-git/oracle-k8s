@@ -5,11 +5,6 @@
 module "virtual_network" {
     source = "./modules/virtualNetwork"
 
-
-    providers = {
-      oci = oci.frankfurt1
-    }
-
     vcn_config = {
         vcn1 = {
             name        = "vcn_01"
