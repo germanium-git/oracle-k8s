@@ -41,8 +41,9 @@ resource oci_core_route_table "rt" {
     vcn_id = oci_core_vcn.vcn[each.key].id
 
     route_rules {
-        cidr_block          = "0.0.0.0/0"
+        destination         = "0.0.0.0/0"
         network_entity_id   = oci_core_internet_gateway.igw[each.key].id
+        destination_type    = "CIDR_BLOCK"
     }
 
     defined_tags = {}
