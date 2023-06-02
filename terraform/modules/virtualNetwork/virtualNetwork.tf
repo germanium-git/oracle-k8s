@@ -58,7 +58,7 @@ resource "oci_core_network_security_group" "nsg" {
     compartment_id  = var.compartment_id
 }
 
-
+# Allows only TCP protocol
 resource "oci_core_network_security_group_security_rule" "nsg_rule" {
     for_each = var.nsg_rules
 
@@ -66,19 +66,13 @@ resource "oci_core_network_security_group_security_rule" "nsg_rule" {
     description               = each.value.description
     source_type               = "CIDR_BLOCK"
     source                    = each.value.source
-    protocol                  = each.value.protocol
+    protocol                  = "6"
     direction                 = "INGRESS"
     stateless                 = false
-
-    dynamic "tcp_options" {
-        for_each = {
-            for index, range in each.value.tcp_options: index => range }
-        
-        content {
-            destination_port_range {
-                max = tcp_options[index].dst_port_range_min
-                min = tcp_options[index].dst_port_range_min
-            }
+    tcp_options {
+        destination_port_range {
+            max = each.value.dst_port_range_max
+            min = each.value.dst_port_range_min
         }
     }
 }
