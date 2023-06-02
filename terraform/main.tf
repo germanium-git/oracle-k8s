@@ -28,8 +28,8 @@ module "virtual_network" {
             description   = "test rule"
             source        = "10.20.30.40"
             protocol      = "6"
-            dst_port_range_min  = "100-200"
-            dst_port_range_max  = "200-300"
+            dst_port_range_min  = 100
+            dst_port_range_max  = 200
         }
     }
 }

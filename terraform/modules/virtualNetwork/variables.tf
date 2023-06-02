@@ -22,8 +22,8 @@ variable "nsg_rules" {
         vcn_key       = string
         description   = string
         source        = string
-        dst_port_range_min  = string
-        dst_port_range_max  = string
+        dst_port_range_min  = number
+        dst_port_range_max  = number
   }))
 }
 
