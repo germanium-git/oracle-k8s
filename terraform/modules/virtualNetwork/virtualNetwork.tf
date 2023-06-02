@@ -40,13 +40,11 @@ resource oci_core_route_table "rt" {
     display_name = "Default RT for ${each.value.name}"
     vcn_id = oci_core_vcn.vcn[each.key].id
 
-    dynamic "route_rules" {
-        for_each = each.value.routes
-        content {
-            cidr_block          = "0.0.0.0/0"
-            network_entity_id   = oci_core_internet_gateway.igw[each.key].id
-        }
+    route_rules {
+        cidr_block          = "0.0.0.0/0"
+        network_entity_id   = oci_core_internet_gateway.igw[each.key].id
     }
+
     defined_tags = {}
     freeform_tags = {}
 }
@@ -78,8 +76,8 @@ resource "oci_core_network_security_group_security_rule" "nsg_rule" {
         
         content {
             destination_port_range {
-                max = tcp_options.dst_port_range_min
-                min = tcp_options.dst_port_range_min
+                max = tcp_options[index].dst_port_range_min
+                min = tcp_options[index].dst_port_range_min
             }
         }
     }
