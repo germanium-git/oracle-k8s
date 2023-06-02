@@ -26,10 +26,69 @@ module "virtual_network" {
         rule1 = {
             vcn_key       = "vcn1"
             description   = "test rule"
-            source        = "10.20.30.40/32"
+            source        = "185.230.172.74/32"
             protocol      = "6"
-            dst_port_range_min  = 100
-            dst_port_range_max  = 200
+            dst_port_range_min  = 22
+            dst_port_range_max  = 22
+        }
+    }
+}
+
+#############################################
+#               Virtual Machines            #
+#############################################
+
+# Images in Frankfurt
+# Canonical-Ubuntu-22.04-2023.04.19-0 ocid1.image.oc1.eu-frankfurt-1.aaaaaaaazjh7dx5267q4cpzeg7fgxhyluqq42usze6ahijkrs6bnwg2d2mdq
+
+# Oracle-Linux-8.6-aarch64-2022.05.30-0 ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaxp2zqotv37r4zycmwfqywcujsh4scenphjjs5w2ozakmidg3vs6q
+
+module "virtual_machine" {
+    source = "./modules/virtualMachine"
+
+    compartment_id = oci_identity_compartment.k8s.compartment_id
+    vm_config = {
+        /*
+        control1 = {
+            shape       = "VM.Standard.A1.Flex"
+            cpu_count   = 2
+            memory_gb   = 12
+            image_id    = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaxp2zqotv37r4zycmwfqywcujsh4scenphjjs5w2ozakmidg3vs6q"
+            subnet_id   = module.virtual_network.subnet["subnet1"].id
+            nsg_ids     = toset([module.virtual_network.nsg["vcn1"].id])
+            ssh_key     = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
+            zone        = 2
+        }
+        control2 = {
+            shape       = "VM.Standard.A1.Flex"
+            cpu_count   = 2
+            memory_gb   = 12
+            image_id    = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaxp2zqotv37r4zycmwfqywcujsh4scenphjjs5w2ozakmidg3vs6q"
+            subnet_id   = module.virtual_network.subnet["subnet1"].id
+            nsg_ids     = toset([module.virtual_network.nsg["vcn1"].id])
+            ssh_key     = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
+            zone        = 2
+        }
+        */
+        worker1 = {
+            shape       = "VM.Standard.E2.1.Micro"
+            cpu_count   = 1
+            memory_gb   = 1
+            image_id    = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaazjh7dx5267q4cpzeg7fgxhyluqq42usze6ahijkrs6bnwg2d2mdq"
+            subnet_id   = module.virtual_network.subnet["subnet1"].id
+            nsg_ids     = toset([module.virtual_network.nsg["vcn1"].id])
+            ssh_key     = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
+            zone        = 2
+        }
+        worker2 = {
+            shape       = "VM.Standard.E2.1.Micro"
+            cpu_count   = 1
+            memory_gb   = 1
+            image_id    = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaazjh7dx5267q4cpzeg7fgxhyluqq42usze6ahijkrs6bnwg2d2mdq"
+            subnet_id   = module.virtual_network.subnet["subnet1"].id
+            nsg_ids     = toset([module.virtual_network.nsg["vcn1"].id])
+            ssh_key     = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
+            zone        = 2
         }
     }
 }
