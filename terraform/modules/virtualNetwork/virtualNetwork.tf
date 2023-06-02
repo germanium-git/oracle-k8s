@@ -6,7 +6,7 @@ resource "oci_core_vcn" "vcn" {
     compartment_id = var.compartment_id
 }
 
-/*
+
 resource "oci_core_subnet" "subnet" {
     for_each = var.subnet_config
 
@@ -61,7 +61,6 @@ resource "oci_core_network_security_group" "nsg" {
 }
 
 
-# NSG Rules
 resource "oci_core_network_security_group_security_rule" "nsg_rule" {
     for_each = var.nsg_rules
 
@@ -85,4 +84,3 @@ resource "oci_core_network_security_group_security_rule" "nsg_rule" {
         }
     }
 }
-*/
