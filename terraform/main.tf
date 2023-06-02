@@ -26,12 +26,10 @@ module "virtual_network" {
         rule1 = {
             vcn_key       = "vcn1"
             description   = "test rule"
-            source        = "10.20.30.40"
+            source        = "10.20.30.40/32"
             protocol      = "6"
-            tcp_options   = [{
-                dst_port_range_min  = 100
-                dst_port_range_max  = 200
-            }]
+            dst_port_range_min  = 100
+            dst_port_range_max  = 200
         }
     }
 }

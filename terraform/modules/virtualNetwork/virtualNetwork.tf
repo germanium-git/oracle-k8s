@@ -6,7 +6,7 @@ resource "oci_core_vcn" "vcn" {
     compartment_id = var.compartment_id
 }
 
-/*
+
 resource "oci_core_subnet" "subnet" {
     for_each = var.subnet_config
 
@@ -40,13 +40,12 @@ resource oci_core_route_table "rt" {
     display_name = "Default RT for ${each.value.name}"
     vcn_id = oci_core_vcn.vcn[each.key].id
 
-    dynamic "route_rules" {
-        for_each = each.value.routes
-        content {
-            cidr_block          = "0.0.0.0/0"
-            network_entity_id   = oci_core_internet_gateway.igw[each.key].id
-        }
+    route_rules {
+        destination         = "0.0.0.0/0"
+        network_entity_id   = oci_core_internet_gateway.igw[each.key].id
+        destination_type    = "CIDR_BLOCK"
     }
+
     defined_tags = {}
     freeform_tags = {}
 }
@@ -60,8 +59,7 @@ resource "oci_core_network_security_group" "nsg" {
     compartment_id  = var.compartment_id
 }
 
-
-# NSG Rules
+# Allows only TCP protocol
 resource "oci_core_network_security_group_security_rule" "nsg_rule" {
     for_each = var.nsg_rules
 
@@ -69,20 +67,13 @@ resource "oci_core_network_security_group_security_rule" "nsg_rule" {
     description               = each.value.description
     source_type               = "CIDR_BLOCK"
     source                    = each.value.source
-    protocol                  = each.value.protocol
+    protocol                  = "6"
     direction                 = "INGRESS"
     stateless                 = false
-
-    dynamic "tcp_options" {
-        for_each = {
-            for index, range in each.value.tcp_options: index => range }
-        
-        content {
-            destination_port_range {
-                max = tcp_options.dst_port_range_min
-                min = tcp_options.dst_port_range_min
-            }
+    tcp_options {
+        destination_port_range {
+            max = each.value.dst_port_range_max
+            min = each.value.dst_port_range_min
         }
     }
 }
-*/

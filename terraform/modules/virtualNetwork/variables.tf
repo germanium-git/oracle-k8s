@@ -22,11 +22,8 @@ variable "nsg_rules" {
         vcn_key       = string
         description   = string
         source        = string
-        protocol      = string
-        tcp_options   = list(object({
-            dst_port_range_min  = number
-            dst_port_range_max  = number
-        }))
+        dst_port_range_min  = number
+        dst_port_range_max  = number
   }))
 }
 
