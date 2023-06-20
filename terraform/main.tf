@@ -25,11 +25,19 @@ module "virtual_network" {
     nsg_rules = {
         rule1 = {
             vcn_key       = "vcn1"
-            description   = "test rule"
+            description   = "ssh"
             source        = "185.230.172.74/32"
             protocol      = "6"
             dst_port_range_min  = 22
             dst_port_range_max  = 22
+        }
+        rule2 = {
+            vcn_key       = "vcn1"
+            description   = "influxdb"
+            source        = "185.230.172.74/32"
+            protocol      = "6"
+            dst_port_range_min  = 8086
+            dst_port_range_max  = 8086
         }
     }
 }
