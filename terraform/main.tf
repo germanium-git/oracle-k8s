@@ -39,6 +39,14 @@ module "virtual_network" {
             dst_port_range_min  = 8086
             dst_port_range_max  = 8086
         }
+        rule3 = {
+            vcn_key       = "vcn1"
+            description   = "portainer"
+            source        = "185.230.172.74/32"
+            protocol      = "6"
+            dst_port_range_min  = 9000
+            dst_port_range_max  = 9000
+        }
     }
 }
 
