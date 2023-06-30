@@ -1,16 +1,16 @@
 variable "vcn_config" {
-    type = map(object({
-        name        = string
-        vcn_cidr    = string
-    }))
+  type = map(object({
+    name     = string
+    vcn_cidr = string
+  }))
 }
 
 variable "subnet_config" {
-    type = map(object({
-        name    = string
-        cidr_id = number
-        vcn_key = string
-    }))
+  type = map(object({
+    name    = string
+    cidr_id = number
+    vcn_key = string
+  }))
 }
 
 
@@ -19,16 +19,16 @@ variable "subnet_config" {
 
 variable "nsg_rules" {
   type = map(object({
-        vcn_key       = string
-        description   = string
-        source        = string
-        dst_port_range_min  = number
-        dst_port_range_max  = number
+    vcn_key            = string
+    description        = string
+    source             = string
+    dst_port_range_min = number
+    dst_port_range_max = number
   }))
 }
 
 
 variable "compartment_id" {
   description = "Compartment Id"
-  type = string
+  type        = string
 }
