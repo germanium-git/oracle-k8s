@@ -1,0 +1,66 @@
+name: "Terraform setup and apply"
+description: "Applys a terraform plan file from an artifact"
+inputs:
+  terraform_directory:
+    description: 'Directory that holds Terraform code'
+    required: true
+  terraform_user_ocid:
+    description: 'Oracle Cloud user OCID'
+    required: true
+  terraform_tenant_ocid:
+    description: 'Oracle Cloud Tenant OCID'
+    required: true
+  terraform_key_privatekey:
+    description: 'Oracle Cloud API private key'
+    required: true
+  terraform_key_fingerprint:
+    description: 'Oracle Cloud API key fingerprint'
+    required: true
+  tfcloud_api_token:
+    description: 'TF Cloud API token for remote statefile'
+    required: true
+  terraform_compartment_ocid:
+    description: 'Oracle Compartment OCID'
+    required: true
+  terraform_version:
+    description: 'Terraform Version'
+    required: true
+    default: 1.4.6
+  github_token:
+    description: 'GitHub token for auth'
+    required: true
+  pr_id:
+    description: 'Pull request ID'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: ${{ inputs.terraform_version }}
+        terraform_wrapper: false
+        cli_config_credentials_token: ${{ inputs.tfcloud_api_token }}
+
+    - name: Terraform Init
+      id: init
+      working-directory: ${{ inputs.terraform_directory }}
+      shell: bash
+      run: |
+        terraform init
+
+    - name: Terraform Destroy
+      id: destroy
+      working-directory: ${{ inputs.terraform_directory }}
+      shell: bash
+      run: |
+        echo 'apply<<EOF' >> $GITHUB_OUTPUT
+        terraform destroy -auto-approve >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+      env:
+        TF_VAR_USER_OCID: ${{ inputs.terraform_user_ocid }}
+        TF_VAR_TENANCY_OCID: ${{ inputs.terraform_tenant_ocid }}
+        TF_VAR_PRIVATE_KEY: ${{ inputs.terraform_key_privatekey }}
+        TF_VAR_FINGERPRINT: ${{ inputs.terraform_key_fingerprint }}
+        TF_VAR_COMPARTMENT_OCID: ${{ inputs.terraform_compartment_ocid }}
