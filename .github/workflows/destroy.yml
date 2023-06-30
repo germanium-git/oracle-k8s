@@ -7,7 +7,7 @@ env:
   TF_IN_AUTOMATION: "True"
 
 jobs:
-  terraform_apply:
+  terraform_destroy:
     runs-on: ubuntu-latest
     environment: test
     steps:
