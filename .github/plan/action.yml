@@ -28,7 +28,7 @@ inputs:
   terraform_version:
     description: 'Terraform Version'
     required: true
-    default: 1.2.9
+    default: 1.4.6
   github_token:
     description: 'GitHub token for auth'
     required: true
