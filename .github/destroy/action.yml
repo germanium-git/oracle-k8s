@@ -1,4 +1,4 @@
-name: "Terraform setup and apply"
+name: "Terraform setup and destroy"
 description: "Applys a terraform plan file from an artifact"
 inputs:
   terraform_directory:
@@ -55,9 +55,7 @@ runs:
       working-directory: ${{ inputs.terraform_directory }}
       shell: bash
       run: |
-        echo 'apply<<EOF' >> $GITHUB_OUTPUT
-        terraform destroy -auto-approve >> $GITHUB_OUTPUT
-        echo 'EOF' >> $GITHUB_OUTPUT
+        terraform destroy -auto-approve
       env:
         TF_VAR_USER_OCID: ${{ inputs.terraform_user_ocid }}
         TF_VAR_TENANCY_OCID: ${{ inputs.terraform_tenant_ocid }}
