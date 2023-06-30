@@ -28,3 +28,9 @@ variable "vcn_cidr" {
   type        = string
   default     = "10.1.0.0/16"
 }
+
+# The value is is stored in TF Cloud as a sensitive variable
+variable "CLOUDFLARE_API_TOKEN" {
+  description = "A valid Cloudflare token with permission to create DNS records"
+  type        = string
+}

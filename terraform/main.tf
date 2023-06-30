@@ -108,3 +108,11 @@ module "virtual_machine" {
     }
   }
 }
+
+
+module "cloudflare_dns" {
+  source = "./modules/cloudFlareDnsRecord"
+
+  vm_public_ip         = module.virtual_machine.vm_public_ip
+  cloudflare_zone_name = "germanium.cz"
+}

@@ -38,5 +38,6 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           tfcloud_api_token: ${{ secrets.TF_API_TOKEN }}
           terraform_compartment_ocid: ${{ secrets.TF_COMPARTMENT_OCID }}
+          terraform_cloudflare_api_token: ${{ secrets.TF_CLOUDFLARE_API_TOKEN }}
           github_token: ${{ secrets.GH_TOKEN }}
           pr_id: ${{ steps.pr-id.outputs.PR_NUMBER }}

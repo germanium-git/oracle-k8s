@@ -4,7 +4,7 @@ inputs:
   terraform_directory:
     description: 'Directory that holds Terraform code'
     required: true
-  terraform_user_ocid: 
+  terraform_user_ocid:
     description: 'Oracle Cloud user OCID'
     required: true
   terraform_tenant_ocid:
@@ -19,6 +19,9 @@ inputs:
   tfcloud_api_token:
     description: 'TF Cloud API token for remote statefile'
     required: true
+  terraform_cloudflare_api_token:
+    description: 'CloudFlare API token'
+    required: true
   terraform_compartment_ocid:
     description: 'Oracle Compartment OCID'
     required: true
@@ -26,7 +29,7 @@ inputs:
     description: 'Terraform Version'
     required: true
     default: 1.2.9
-  github_token: 
+  github_token:
     description: 'GitHub token for auth'
     required: true
   pr_id:
@@ -74,6 +77,7 @@ runs:
         TF_VAR_PRIVATE_KEY: ${{ inputs.terraform_key_privatekey }}
         TF_VAR_FINGERPRINT: ${{ inputs.terraform_key_fingerprint }}
         TF_VAR_COMPARTMENT_OCID: ${{ inputs.terraform_compartment_ocid }}
+        TF_VAR_CLOUDFLARE_API_TOKEN: ${{ inputs.terraform_cloudflare_api_token }}
 
     - name: Comment Apply
       id: comment-apply
