@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: test
     steps:
+      - uses: actions/checkout@v3
+
       - name: Terraform Destroy
         uses: ./.github/destroy
         with:
