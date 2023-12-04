@@ -97,17 +97,17 @@ module "virtual_machine" {
       zone       = 2
       storage_gb = 50
     }
-    # artemis = {
-    #   shape      = "VM.Standard.E2.1.Micro"
-    #   cpu_count  = 1
-    #   memory_gb  = 1
-    #   image_id   = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaazjh7dx5267q4cpzeg7fgxhyluqq42usze6ahijkrs6bnwg2d2mdq"
-    #   subnet_id  = module.virtual_network.subnet["subnet1"].id
-    #   nsg_ids    = toset([module.virtual_network.nsg["vcn1"].id])
-    #   ssh_key    = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
-    #   zone       = 2
-    #   storage_gb = 50
-    # }
+    artemis = {
+      shape      = "VM.Standard.E2.1.Micro"
+      cpu_count  = 1
+      memory_gb  = 1
+      image_id   = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaazjh7dx5267q4cpzeg7fgxhyluqq42usze6ahijkrs6bnwg2d2mdq"
+      subnet_id  = module.virtual_network.subnet["subnet1"].id
+      nsg_ids    = toset([module.virtual_network.nsg["vcn1"].id])
+      ssh_key    = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
+      zone       = 2
+      storage_gb = 50
+    }
   }
 }
 
