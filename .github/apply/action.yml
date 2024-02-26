@@ -40,7 +40,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
+      uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: ${{ inputs.terraform_version }}
         terraform_wrapper: false
@@ -55,7 +55,7 @@ runs:
 
     - name: Download Plan
       id: download-plan
-      uses: dawidd6/action-download-artifact@v2
+      uses: dawidd6/action-download-artifact@v3
       with:
         github_token: ${{ inputs.github_token }}
         workflow: plan.yml
@@ -81,7 +81,7 @@ runs:
 
     - name: Comment Apply
       id: comment-apply
-      uses: peter-evans/create-or-update-comment@v2
+      uses: peter-evans/create-or-update-comment@v4
       with:
         token: ${{ inputs.github_token }}
         issue-number: ${{ inputs.pr_id }}
