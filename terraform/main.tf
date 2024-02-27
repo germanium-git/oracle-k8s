@@ -54,6 +54,8 @@ module "virtual_network" {
       protocol           = "6"
       dst_port_range_min = 80
       dst_port_range_max = 80
+      dst_port_range_min = 9443
+      dst_port_range_max = 9443
     }
   }
 }
