@@ -97,7 +97,7 @@ module "virtual_machine" {
       zone       = 2
       storage_gb = 50
     }
-    vojta = {
+    neptun = {
       shape      = "VM.Standard.E2.1.Micro"
       cpu_count  = 1
       memory_gb  = 1
