@@ -40,6 +40,16 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # Dependabot has no access to secrets and tf init with remote backend will fail
+    - name: Stop if Dependabot branch
+      id: check_dependabot
+      shell: bash
+      run: |
+        if [[ "${{ github.ref }}" == *"dependabot/github_actions"* ]]; then
+          echo "Dependabot branch detected, stopping workflow."
+          exit 1
+        fi
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
