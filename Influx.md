@@ -170,6 +170,6 @@ sudo cat config/influx-configs
 
 # Troubleshooting - inspect logs
 docker logs -t 117e458ef54d
-# https://stackoverflow.com/questions/36666246/docker-look-at-the-log-of-an-exited-container
+Or if the containre has existed follow the instructions from the arrticle [docker-look-at-the-log-of-an-exited-container](https://stackoverflow.com/questions/36666246/docker-look-at-the-log-of-an-exited-container).
 
 ```
