@@ -44,8 +44,16 @@ module "virtual_network" {
       description        = "portainer"
       source             = "185.230.172.74/32"
       protocol           = "6"
-      dst_port_range_min = 9000
-      dst_port_range_max = 9000
+      dst_port_range_min = 9443
+      dst_port_range_max = 9443
+    }
+    rule4 = {
+      vcn_key            = "vcn1"
+      description        = "socat acme.sh"
+      source             = "0.0.0.0/0"
+      protocol           = "6"
+      dst_port_range_min = 80
+      dst_port_range_max = 80
     }
   }
 }
