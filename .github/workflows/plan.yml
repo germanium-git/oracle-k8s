@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+    # paths:
+    #   - 'terraform/**'  # Only trigger if changes are made inside the src/ folder
   workflow_dispatch:  # Enables manual trigger
 
 env:
