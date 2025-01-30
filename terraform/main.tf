@@ -55,6 +55,14 @@ module "virtual_network" {
       dst_port_range_min = 80
       dst_port_range_max = 80
     }
+    rule5 = {
+      vcn_key            = "vcn1"
+      description        = "ubuntu-upgrade"
+      source             = "185.230.172.74/32"
+      protocol           = "6"
+      dst_port_range_min = 1022
+      dst_port_range_max = 1022
+    }
   }
 }
 
