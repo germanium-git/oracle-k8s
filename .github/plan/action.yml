@@ -88,6 +88,7 @@ runs:
         path: ${{ inputs.terraform_directory }}/tfplan
 
     - name: Comment Plan
+      if: github.event_name != 'workflow_dispatch'
       id: comment-plan
       uses: peter-evans/create-or-update-comment@v4
       with:
