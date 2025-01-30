@@ -2,6 +2,9 @@ name: Terraform Plan
 
 on:
   pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Enables manual trigger
 
 env:
   TERRAFORM_VERSION: "1.4.6"
