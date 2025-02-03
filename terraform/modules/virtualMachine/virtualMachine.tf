@@ -12,6 +12,7 @@ resource "oci_core_instance" "vm" {
   source_details {
     source_id   = each.value.image_id
     source_type = "image"
+    boot_volume_size_in_gbs = 50
   }
 
   display_name = each.key
@@ -32,4 +33,11 @@ resource "oci_core_instance" "vm" {
   }
 
   preserve_boot_volume = false
+
+  lifecycle {
+    ignore_changes = [
+      shape_config
+    ]
+  }
+
 }

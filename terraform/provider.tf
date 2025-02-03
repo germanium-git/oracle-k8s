@@ -1,12 +1,12 @@
 terraform {
   required_providers {
     oci = {
-      source = "oracle/oci"
-      version = "5.2.1"
+      source  = "oracle/oci"
+      version = "6.23.0"
     }
     cloudflare = {
-      source = "cloudflare/cloudflare"
-      version = "4.9.0"
+      source  = "cloudflare/cloudflare"
+      version = "4.51.0"
     }
   }
   backend "remote" {
@@ -16,7 +16,7 @@ terraform {
       name = "oracle-k8s"
     }
   }
-  required_version = "1.4.6"
+  required_version = "1.10.5"
 }
 
 provider "oci" {

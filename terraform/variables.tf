@@ -11,11 +11,13 @@ variable "USER_OCID" {
 variable "FINGERPRINT" {
   description = "OCI API key fingerprint"
   type        = string
+  sensitive   = true
 }
 
 variable "PRIVATE_KEY" {
   description = "OCI API key private key"
   type        = string
+  sensitive   = true
 }
 
 variable "COMPARTMENT_OCID" {
@@ -32,5 +34,11 @@ variable "vcn_cidr" {
 # The value is is stored in TF Cloud as a sensitive variable
 variable "CLOUDFLARE_API_TOKEN" {
   description = "A valid Cloudflare token with permission to create DNS records"
+  type        = string
+  sensitive   = true
+}
+
+variable "CLOUDFLARE_ZONE_ID" {
+  description = "Cloudflare Zone ID"
   type        = string
 }

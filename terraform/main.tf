@@ -20,7 +20,7 @@ module "virtual_network" {
     }
   }
 
-  compartment_id = oci_identity_compartment.k8s.compartment_id
+  compartment_id = var.TENANCY_OCID
 
   nsg_rules = {
     rule1 = {
@@ -78,7 +78,7 @@ module "virtual_network" {
 module "virtual_machine" {
   source = "./modules/virtualMachine"
 
-  compartment_id = oci_identity_compartment.k8s.compartment_id
+  compartment_id = var.TENANCY_OCID
   vm_config = {
     /*
         control1 = {
@@ -102,11 +102,11 @@ module "virtual_machine" {
             zone        = 2
         }
         */
-    worker1 = {
+    uran = {
       shape      = "VM.Standard.E2.1.Micro"
       cpu_count  = 1
       memory_gb  = 1
-      image_id   = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaazjh7dx5267q4cpzeg7fgxhyluqq42usze6ahijkrs6bnwg2d2mdq"
+      image_id   = local.latest_image
       subnet_id  = module.virtual_network.subnet["subnet1"].id
       nsg_ids    = toset([module.virtual_network.nsg["vcn1"].id])
       ssh_key    = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
@@ -117,7 +117,7 @@ module "virtual_machine" {
       shape      = "VM.Standard.E2.1.Micro"
       cpu_count  = 1
       memory_gb  = 1
-      image_id   = "ocid1.image.oc1.eu-frankfurt-1.aaaaaaaazjh7dx5267q4cpzeg7fgxhyluqq42usze6ahijkrs6bnwg2d2mdq"
+      image_id   = local.latest_image
       subnet_id  = module.virtual_network.subnet["subnet1"].id
       nsg_ids    = toset([module.virtual_network.nsg["vcn1"].id])
       ssh_key    = file("sshkey/petr.nemec@gmx.com_2023-05-21T20_18_59.854Z_putty.pub")
@@ -131,6 +131,6 @@ module "virtual_machine" {
 module "cloudflare_dns" {
   source = "./modules/cloudFlareDnsRecord"
 
-  vm_public_ip         = module.virtual_machine.vm_public_ip
-  cloudflare_zone_name = "germanium.cz"
+  vm_public_ip       = module.virtual_machine.vm_public_ip
+  cloudflare_zone_id = var.CLOUDFLARE_ZONE_ID
 }
