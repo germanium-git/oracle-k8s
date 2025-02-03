@@ -1,7 +1,7 @@
 variable "vm_public_ip" {
-    type = map(string)
+  type = map(string)
 }
 
-variable "cloudflare_zone_name" {
+variable "cloudflare_zone_id" {
   type = string
 }

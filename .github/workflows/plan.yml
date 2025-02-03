@@ -9,7 +9,7 @@ on:
   workflow_dispatch:  # Enables manual trigger
 
 env:
-  TERRAFORM_VERSION: "1.4.6"
+  TERRAFORM_VERSION: "1.10.5"
   TF_IN_AUTOMATION: "True"
 
 jobs:
@@ -42,5 +42,6 @@ jobs:
           tfcloud_api_token: ${{ secrets.TF_API_TOKEN }}
           terraform_compartment_ocid: ${{ secrets.TF_COMPARTMENT_OCID }}
           terraform_cloudflare_api_token: ${{ secrets.TF_CLOUDFLARE_API_TOKEN }}
+          terraform_cloudflare_zone_id: ${{ secrets.TF_CLOUDFLARE_ZONE_ID }}
           github_token: ${{ secrets.GH_TOKEN }}
           pr_id: ${{ steps.pr-id.outputs.PR_NUMBER }}
