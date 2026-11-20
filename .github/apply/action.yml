@@ -81,9 +81,20 @@ runs:
       working-directory: ${{ inputs.terraform_directory }}
       shell: bash
       run: |
-        echo 'apply<<EOF' >> $GITHUB_OUTPUT
-        terraform apply -input=false -no-color tfplan >> $GITHUB_OUTPUT
-        echo 'EOF' >> $GITHUB_OUTPUT
+        # Same pattern as the plan step: always close the delimiter and keep
+        # the exit code, so a failed apply shows its real error.
+        set +e
+        terraform apply -input=false -no-color tfplan > apply.txt 2>&1
+        rc=$?
+        set -e
+        cat apply.txt
+        delimiter="APPLY_$(openssl rand -hex 8)"
+        {
+          echo "apply<<${delimiter}"
+          cat apply.txt
+          echo "${delimiter}"
+        } >> "$GITHUB_OUTPUT"
+        exit $rc
       env:
         TF_VAR_USER_OCID: ${{ inputs.terraform_user_ocid }}
         TF_VAR_TENANCY_OCID: ${{ inputs.terraform_tenant_ocid }}
