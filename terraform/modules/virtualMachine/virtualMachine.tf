@@ -10,8 +10,8 @@ resource "oci_core_instance" "vm" {
   shape               = each.value.shape
 
   source_details {
-    source_id   = each.value.image_id
-    source_type = "image"
+    source_id               = each.value.image_id
+    source_type             = "image"
     boot_volume_size_in_gbs = 50
   }
 
@@ -35,8 +35,13 @@ resource "oci_core_instance" "vm" {
   preserve_boot_volume = false
 
   lifecycle {
+    # source_id: the root module passes the newest Ubuntu image; a newer
+    # image must not force replacement of an existing instance (it would
+    # wipe the boot disk). New instances still get the latest image.
+    # To rebuild a VM on a newer image, use `terraform apply -replace=...`.
     ignore_changes = [
-      shape_config
+      shape_config,
+      source_details[0].source_id,
     ]
   }
 
