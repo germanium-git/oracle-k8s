@@ -1,40 +1,85 @@
 #!/usr/bin/env bash
-# Create a scoped Cloudflare API token for Terraform and store it directly in
-# the GitHub Actions secret TF_CLOUDFLARE_API_TOKEN (the value is never shown).
+# Create a scoped Cloudflare API token for Terraform and store it directly
+# where Terraform reads it (the value is never shown):
+#   - a GitHub Actions secret (default; oracle-k8s), or
+#   - a sensitive variable in a Terraform Cloud workspace (temp-monitor)
 #
 # Usage (from a regular terminal):
-#   ./scripts/cf-token.sh
+#   ./scripts/cf-token.sh                      # oracle-k8s: GitHub secret
+#   TARGET=tfc ./scripts/cf-token.sh           # temp-monitor: Terraform Cloud
 #
 # The script walks you through everything. Optional overrides:
-#   ZONE_ID     Cloudflare zone id (default: the oracle-k8s zone)
-#   GH_ENV      store as a GitHub environment secret instead of a repo secret
-#   TOKEN_DAYS  validity of the new token in days (default 365)
-#   REPO        GitHub repository (default germanium-git/oracle-k8s)
+#   ZONE_ID        Cloudflare zone id. Default: oracle-k8s zone (github);
+#                  read from the workspace variable cloudflare_zone_id (tfc)
+#   TOKEN_DAYS     validity of the new token in days (default 365)
+#   github target: REPO (default germanium-git/oracle-k8s),
+#                  SECRET (default TF_CLOUDFLARE_API_TOKEN), GH_ENV
+#   tfc target:    TFC_ORG (default mygermanium),
+#                  TFC_WORKSPACE (default oci-temp-monitor),
+#                  TFC_VAR (default cloudflare_api_token)
 set -euo pipefail
 
-ZONE_ID="${ZONE_ID:-7d3f63ac039666ab600b5796c54e7ba6}"
-REPO="${REPO:-germanium-git/oracle-k8s}"
+TARGET="${TARGET:-github}"
 TOKEN_DAYS="${TOKEN_DAYS:-365}"
+REPO="${REPO:-germanium-git/oracle-k8s}"
+SECRET="${SECRET:-TF_CLOUDFLARE_API_TOKEN}"
+TFC_ORG="${TFC_ORG:-mygermanium}"
+TFC_WORKSPACE="${TFC_WORKSPACE:-oci-temp-monitor}"
+TFC_VAR="${TFC_VAR:-cloudflare_api_token}"
 CF=https://api.cloudflare.com/client/v4
+TFC=https://app.terraform.io/api/v2
 
 step() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 ok()   { printf '    \033[32m✓\033[0m %s\n' "$*"; }
 die()  { printf '    \033[31m✗\033[0m %s\n' "$*" >&2; exit 1; }
 
 # --- checks -----------------------------------------------------------------
-step "Checking prerequisites"
-for cmd in curl jq gh; do
+step "Checking prerequisites (target: $TARGET)"
+[[ -t 0 ]] || die "Run this script in a regular terminal; it needs to ask for input."
+for cmd in curl jq; do
   command -v "$cmd" >/dev/null || die "Missing '$cmd'. Install it and run again."
 done
-gh auth status >/dev/null 2>&1 || die "GitHub CLI is not logged in. Run: gh auth login"
-[[ -t 0 ]] || die "Run this script in a regular terminal; it needs to ask for input."
-ok "curl, jq and gh are available, gh is logged in"
+
+case "$TARGET" in
+  github)
+    command -v gh >/dev/null || die "Missing 'gh'. Install it and run again."
+    gh auth status >/dev/null 2>&1 || die "GitHub CLI is not logged in. Run: gh auth login"
+    ZONE_ID="${ZONE_ID:-7d3f63ac039666ab600b5796c54e7ba6}"
+    DEST="GitHub secret $SECRET in $REPO${GH_ENV:+ (environment $GH_ENV)}"
+    TOKEN_LABEL="${REPO#*/} terraform"
+    ;;
+  tfc)
+    TFC_TOKEN="${TF_TOKEN_app_terraform_io:-}"
+    if [[ -z "$TFC_TOKEN" && -f ~/.terraform.d/credentials.tfrc.json ]]; then
+      TFC_TOKEN=$(jq -r '.credentials["app.terraform.io"].token // empty' ~/.terraform.d/credentials.tfrc.json)
+    fi
+    [[ -n "$TFC_TOKEN" ]] || die "Not logged in to Terraform Cloud. Run: terraform login"
+    tfc() { curl -sS -H "Authorization: Bearer $TFC_TOKEN" -H "Content-Type: application/vnd.api+json" "$@"; }
+
+    WS=$(tfc "$TFC/organizations/$TFC_ORG/workspaces/$TFC_WORKSPACE")
+    WS_ID=$(jq -r '.data.id // empty' <<<"$WS")
+    [[ -n "$WS_ID" ]] || die "Workspace $TFC_ORG/$TFC_WORKSPACE not found or no access ($(jq -r '[.errors[]?.title]|join("; ")' <<<"$WS"))."
+    VARS=$(tfc "$TFC/workspaces/$WS_ID/vars")
+    VAR_ID=$(jq -r --arg k "$TFC_VAR" '.data[] | select(.attributes.key==$k and .attributes.category=="terraform") | .id' <<<"$VARS")
+    [[ -n "$VAR_ID" ]] || die "Variable '$TFC_VAR' not found in workspace $TFC_WORKSPACE."
+    if [[ -z "${ZONE_ID:-}" ]]; then
+      ZONE_ID=$(jq -r '.data[] | select(.attributes.key=="cloudflare_zone_id") | .attributes.value // empty' <<<"$VARS")
+      [[ -n "$ZONE_ID" ]] || read -rp "    Zone id isn't readable from the workspace (sensitive). Enter it: " ZONE_ID
+    fi
+    DEST="Terraform Cloud variable $TFC_VAR in $TFC_ORG/$TFC_WORKSPACE"
+    TOKEN_LABEL="$TFC_WORKSPACE terraform"
+    ;;
+  *) die "Unknown TARGET '$TARGET' (use github or tfc)" ;;
+esac
+[[ -n "${ZONE_ID:-}" ]] || die "No Cloudflare zone id."
+ok "Will store the new token in: $DEST"
+ok "Zone: $ZONE_ID"
 
 # --- bootstrap token ---------------------------------------------------------
 step "Bootstrap token (a short-lived token that is allowed to create the real one)"
 TOKENS_URL=https://dash.cloudflare.com/profile/api-tokens
 cat <<EOF
-    Create it in the Cloudflare dashboard now:
+    Create it in the Cloudflare dashboard now (or reuse one that hasn't expired):
 
       1. Open ${TOKENS_URL}
          (My Profile -> API tokens. NOT "Manage Account -> Account API Tokens")
@@ -105,7 +150,7 @@ ok "Token can create other tokens"
 step "Creating the Terraform token"
 EXPIRES=$(date -u -d "+${TOKEN_DAYS} days" +%Y-%m-%dT%H:%M:%SZ)
 BODY=$(jq -n --arg z "$ZONE_ID" --arg d "$DNS_WRITE" --arg r "$ZONE_READ" \
-  --arg exp "$EXPIRES" --arg name "oracle-k8s terraform $(date -u +%F)" '{
+  --arg exp "$EXPIRES" --arg name "$TOKEN_LABEL $(date -u +%F)" '{
     name: $name,
     expires_on: $exp,
     policies: [{
@@ -120,13 +165,25 @@ unset BOOT
 [[ -n "$TOKEN" ]] || die "Cloudflare didn't create the token ($(cf_error "$CREATED"))."
 ok "Created (DNS Write + Zone Read on zone $ZONE_ID, expires $EXPIRES)"
 
-# --- store in GitHub -------------------------------------------------------
-step "Saving to GitHub"
-ENV_ARGS=()
-[[ -n "${GH_ENV:-}" ]] && ENV_ARGS=(--env "$GH_ENV")
-gh secret set TF_CLOUDFLARE_API_TOKEN --repo "$REPO" "${ENV_ARGS[@]}" <<<"$TOKEN" >/dev/null
+# --- store it ---------------------------------------------------------------
+step "Saving the token"
+case "$TARGET" in
+  github)
+    ENV_ARGS=()
+    [[ -n "${GH_ENV:-}" ]] && ENV_ARGS=(--env "$GH_ENV")
+    gh secret set "$SECRET" --repo "$REPO" "${ENV_ARGS[@]}" <<<"$TOKEN" >/dev/null
+    ;;
+  tfc)
+    PATCH=$(jq -n --arg id "$VAR_ID" --arg v "$TOKEN" \
+      '{data: {type: "vars", id: $id, attributes: {value: $v, sensitive: true}}}')
+    RES=$(tfc -X PATCH "$TFC/workspaces/$WS_ID/vars/$VAR_ID" -d @- <<<"$PATCH")
+    unset PATCH
+    [[ $(jq -r '.data.id // empty' <<<"$RES") == "$VAR_ID" ]] \
+      || die "Terraform Cloud didn't accept the update ($(jq -r '[.errors[]?.detail // .errors[]?.title]|join("; ")' <<<"$RES"))."
+    ;;
+esac
 unset TOKEN
-ok "TF_CLOUDFLARE_API_TOKEN updated in $REPO${GH_ENV:+ (environment: $GH_ENV)}"
+ok "Updated: $DEST"
 
 if command -v powershell.exe >/dev/null 2>&1; then
   powershell.exe -NoProfile -Command Set-Clipboard -Value "' '" >/dev/null 2>&1 \
@@ -137,7 +194,6 @@ cat <<EOF
 
 Done. Next steps:
   - Delete the "bootstrap" token at ${TOKENS_URL} (or let it expire).
-  - Re-run the Terraform plan, e.g. push a commit to the PR or:
-      gh run rerun \$(gh run list --repo $REPO --workflow plan.yml --limit 1 --json databaseId -q '.[0].databaseId')
+  - Re-run the Terraform plan (push a commit to the PR, or re-run the failed workflow run).
   - The new token expires $EXPIRES; run this script again before then.
 EOF
